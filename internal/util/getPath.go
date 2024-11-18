@@ -1,4 +1,4 @@
-package services
+package util 
 
 import (
 	"log"
@@ -11,6 +11,7 @@ func GetPath() string {
 	if err != nil {
 		log.Fatal("Error on getting Path")
 	}
-	dir := strings.Split(absPath, "Note-Taking-App")[0] + "Note-Taking-App/"
+	dir := filepath.Join(strings.Split(absPath, "Note-Taking-App")[0], "Note-Taking-App")
+	log.Println("project path: " + dir)
 	return dir
 }

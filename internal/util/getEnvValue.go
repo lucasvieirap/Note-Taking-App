@@ -1,4 +1,4 @@
-package env
+package util
 
 import (
 	"log"
@@ -8,7 +8,7 @@ import (
 func GetEnvValue(field string, fallback string) string {
 	result, ok := os.LookupEnv(field)
 	if !ok {
-		log.Println("Env variable PATH not present")
+		log.Println("Env variable " + field + " not present")
 		return fallback
 	}
 	return result
