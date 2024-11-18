@@ -9,6 +9,7 @@ import (
 
 	"github.com/lucasvieirap/Note-Taking-App/internal/models"
 	"github.com/lucasvieirap/Note-Taking-App/internal/database"
+	"github.com/lucasvieirap/Note-Taking-App/internal/util"
 )
 
 // Save markdown file in database
@@ -19,11 +20,13 @@ func SaveNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	note := models.Note{ ID: 1, Markdown: requestBody, }
-	// jsonote, err := json.Marshal(note)
 	if err != nil {
 		log.Println("Error on JSON Parsing.")
 	}
+
+	encryptedBody, err := util.Encrypt(note.Markdown, []byte(util.GetEnvValue("AESKEY", "")))
+	encryptedNote := models.Note{ ID: note.ID, Markdown: encryptedBody }
 	
-	database.Insert(note)
+	database.Insert(encryptedNote)
 	w.Write([]byte("Saved note with id: " + strconv.Itoa(note.ID)))
 }
