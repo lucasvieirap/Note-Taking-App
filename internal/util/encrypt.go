@@ -6,34 +6,58 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"io"
-	"log"
 )
 
 func Encrypt(data []byte, keystr []byte) ([]byte, error) {
-
-	// keystr := make([]byte, 32)
-	// if _, err := rand.Reader.Read(keystr); err != nil {
-	// 	log.Println("Error on Creating KEY")
-	// }
-	// log.Println("KEY: " + string(keystr))
-
-	key, _ := hex.DecodeString(string(keystr))
+	key, err := hex.DecodeString(string(keystr))
+	if err != nil {
+		return nil, err
+	}
+	
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		log.Println("Error on Creating AES CIPHER")
+		return nil, err
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		log.Println("Error on Creating GCM")
+		return nil, err
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
-	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		log.Println("Error on Creating NONCE")
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
 	}
 
 	cipherText := gcm.Seal(nonce, nonce, data, nil)
-
 	return []byte(hex.EncodeToString(cipherText)), nil
+}
+
+func Decrypt(data []byte, keystr []byte) ([]byte, error) {
+	key, err := hex.DecodeString(string(keystr))
+	if err != nil {
+		return nil, err
+	}
+
+	enc, err := hex.DecodeString(string(data))
+	if err != nil {
+		return nil, err
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonce, cipherText := enc[:gcm.NonceSize()], enc[gcm.NonceSize():]
+	plainText, err := gcm.Open(nil, nonce, cipherText, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return plainText, nil
 }
