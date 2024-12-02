@@ -5,20 +5,10 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"database/sql"
 	"github.com/lucasvieirap/Note-Taking-App/internal/storage"
 )
 
-func HandleRemoveNote(w http.ResponseWriter, r *http.Request, db *sql.DB) {
-	requestBody, err := io.ReadAll(r.Body)
-	if err != nil {
-		log.Println("No id on DELETE request")
-	}
-
-	storage.RemoveFromTableUsingId(db, requestBody)
-}
-
-func HandleRemoveNote2(w http.ResponseWriter, r *http.Request, store storage.Storage) {
+func HandleRemoveNote(w http.ResponseWriter, r *http.Request, store storage.Storage) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		log.Println("No id on DELETE request")
@@ -26,7 +16,8 @@ func HandleRemoveNote2(w http.ResponseWriter, r *http.Request, store storage.Sto
 
 	deleteNoteId, err := strconv.Atoi(string(requestBody))
 	if err != nil || deleteNoteId < 0{
-		log.Println("ID Not a valid number.")
+		log.Println("ID Not a valid number: " + string(requestBody))
+		w.Write([]byte("Invalid ID\n"))
 	}
 
 	store.Delete(uint(deleteNoteId))
