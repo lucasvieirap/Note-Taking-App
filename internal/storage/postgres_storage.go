@@ -44,6 +44,11 @@ func (p *PostgresStorage) Get() *models.Note {
 	}
 }
 
+func (p *PostgresStorage) Update(id uint, note models.Note) {
+	sql := "UPDATE"
+	log.Println(sql)
+}
+
 func (p *PostgresStorage) GetAll() []models.Note {
 	sql := "SELECT * FROM notes";
 	rowList, err := p.DBConn.Query(sql)

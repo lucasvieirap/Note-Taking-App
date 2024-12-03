@@ -12,6 +12,10 @@ func RouteHome(mux *http.ServeMux) {
 	mux.HandleFunc("GET /", controllers.HandleHomeRouter)
 }
 
+func RouteHomePage(mux *http.ServeMux) {
+	mux.HandleFunc("GET /home", controllers.HandleHomePageRouter)
+}
+
 func RouteGrammar(mux *http.ServeMux) {
 	mux.HandleFunc("GET /grammar", controllers.HandleCheckGrammar)
 }

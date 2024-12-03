@@ -22,6 +22,7 @@ func NewServer(address string, router *http.ServeMux, store storage.Storage) *Se
 
 func (s *Server) Listen() error {
 	RouteHome(s.Router)
+	RouteHomePage(s.Router)
 	RouteGrammar(s.Router)
 	RouteList(s.Router, &s.store)
 	RouteSave(s.Router, &s.store)
