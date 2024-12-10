@@ -7,11 +7,28 @@ import (
 	"log"
 	"net/http"
 	"encoding/json"
-	// "strconv"
+	"strconv"
+	"strings"
 )
 
 type noteListModel struct {
 	NoteList []models.Note `json:"noteList"`
+}
+
+func (nl noteListModel) MarshalJSON() ([]byte, error) {
+	jsonData := `{"noteList":[`
+
+	for index, note := range nl.NoteList {
+		markdownReplaced := strings.Replace(strings.Replace(string(note.Markdown), "\n", "\\n", -1), "\"", "'", -1)
+		jsonData += `{"id":"` + strconv.Itoa(int(note.ID)) + `", ` + `"note":"` + markdownReplaced + `"}`
+		if index < len(nl.NoteList) -1 {
+			jsonData += ", "
+		}
+	}
+
+	jsonData +=  `]}`
+
+	return []byte(jsonData), nil
 }
 
 func HandleListNotes(w http.ResponseWriter, r *http.Request, storage storage.Storage) {
@@ -35,11 +52,10 @@ func HandleListNotes(w http.ResponseWriter, r *http.Request, storage storage.Sto
 	}
 
 	jsonMessage, err := json.Marshal(decryptedNoteList)
-
 	if err != nil {
-		log.Println("Error on JSONFY Message")
+		log.Println(err)
 	}
 
-	w.Write(jsonMessage)
+	w.Write([]byte(string(jsonMessage) + "\n"))
 }
 
