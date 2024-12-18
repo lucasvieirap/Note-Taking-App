@@ -4,16 +4,31 @@ import (
 	"github.com/lucasvieirap/Note-Taking-App/internal/controllers"
 	"github.com/lucasvieirap/Note-Taking-App/internal/storage"
 	"net/http"
+	"strings"
+	"strconv"
 )
-
-// TODO: Create dynamic routing for every entry on notes
 
 func RouteHome(mux *http.ServeMux) {
 	mux.HandleFunc("GET /", controllers.HandleHomeRouter)
 }
 
-func RouteHomePage(mux *http.ServeMux) {
-	mux.HandleFunc("GET /home", controllers.HandleHomePageRouter)
+func RouteNotePage(mux *http.ServeMux, storage *storage.Storage) {
+	mux.HandleFunc("GET /note/", func(w http.ResponseWriter, r *http.Request) {
+		var page []string
+		page = strings.Split(r.URL.Path, "/")
+		noteID := page[len(page)-1]
+		controllers.HandleNotePageRouter(w, r, *storage, noteID)
+	})
+}
+
+func RouteUpdateNote(mux *http.ServeMux, storage *storage.Storage) {
+	mux.HandleFunc("PUT /note/", func(w http.ResponseWriter, r *http.Request) {
+		var page []string
+		page = strings.Split(r.URL.Path, "/")
+		noteID := page[len(page)-1]
+		intNoteId, _ := strconv.Atoi(noteID)
+		controllers.HandleUpdateNote(w, r, *storage, uint(intNoteId))
+	})
 }
 
 func RouteGrammar(mux *http.ServeMux) {
@@ -21,8 +36,12 @@ func RouteGrammar(mux *http.ServeMux) {
 }
 
 func RouteRemove(mux *http.ServeMux, storage *storage.Storage) {
-	mux.HandleFunc("DELETE /remove", func(w http.ResponseWriter, r *http.Request) {
-		controllers.HandleRemoveNote(w, r, *storage)
+	mux.HandleFunc("DELETE /note/", func(w http.ResponseWriter, r *http.Request) {
+		var page []string
+		page = strings.Split(r.URL.Path, "/")
+		noteID := page[len(page)-1]
+		intNoteId, _ := strconv.Atoi(noteID)
+		controllers.HandleRemoveNote(w, r, *storage, uint(intNoteId))
 	})
 }
 
